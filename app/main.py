@@ -1,34 +1,40 @@
 class Dictionary:
-    def __init__(self):
-        self._capacity = 8
-        self._size = 0
-        self._table = [[] for _ in range(self._capacity)]
+    def __init__(self) -> None:
+        self.capacity = 8
+        self.load_factor = 2 / 3
+        self.length = 0
+        self.table = [None] * self.capacity
 
-    def __setitem__(self, key, value):
-        index = hash(key) % self._capacity
-        bucket = self._table[index]
+    def __setitem__(self, key, value) -> None:
+        index = hash(key) % self.capacity
 
-        for item in bucket:
-            if item["key"] == key:
-                item["value"] = value
+        if self.table[index] is None:
+            self.table[index] = []
+
+        for node in self.table[index]:
+            if node["key"] == key:
+                node["value"] = value
                 return
 
-        bucket.append({
+        self.table[index].append({
             "key": key,
             "hash": hash(key),
-            "value": value
+            "value": value,
         })
-        self._size += 1
+
+        self.length += 1
 
     def __getitem__(self, key):
-        index = hash(key) % self._capacity
-        bucket = self._table[index]
+        index = hash(key) % self.capacity
 
-        for item in bucket:
-            if item["key"] == key:
-                return item["value"]
+        if self.table[index] is None:
+            raise KeyError(f"Key {key} is not found")
 
-        raise KeyError(key)
+        for node in self.table[index]:
+            if node["key"] == key:
+                return node["value"]
 
-    def __len__(self):
-        return self._size
+        raise KeyError(f"Key {key} is not found")
+
+    def __len__(self) -> int:
+        return self.length
